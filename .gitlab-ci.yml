@@ -30,12 +30,12 @@ deploy:
   stage: deploy
   script:
     - echo "Deploying application..."
-    - ssh ec2-user@<EC2_IP_ADDRESS> 'cd /path/to/your/app && git pull origin main && npm install && pm2 reload all'
+    - ssh ec2-user@3.85.105.202 'cd /d/aws-pipeline/test-repo && git pull origin main && npm install && pm2 reload all'
   only:
     - master
   environment:
     name: production
-    url: http://<EC2_IP_ADDRESS>
+    url: http://3.85.105.202
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
