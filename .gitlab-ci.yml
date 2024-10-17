@@ -1,0 +1,44 @@
+stages:
+  - build
+  - test
+  - deploy
+
+# Build Job
+build:
+  stage: build
+  image: node:16
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - node_modules/
+      - dist/
+
+# Test Job
+test:
+  stage: test
+  image: node:16
+  script:
+    - npm install
+    - npm test
+  only:
+    - master
+
+# Deploy Job
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+    - ssh ec2-user@<EC2_IP_ADDRESS> 'cd /path/to/your/app && git pull origin main && npm install && pm2 reload all'
+  only:
+    - master
+  environment:
+    name: production
+    url: http://<EC2_IP_ADDRESS>
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
